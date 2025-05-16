@@ -93,6 +93,7 @@ class Exp_Informer(Exp_Basic):
             cols=args.cols
         )
         print(flag, len(data_set))
+        print('Dataset Scaler', data_set.scaler)
         data_loader = DataLoader(
             data_set,
             batch_size=batch_size,
