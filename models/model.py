@@ -8,12 +8,14 @@ from models.decoder import Decoder, DecoderLayer
 from models.attn import FullAttention, ProbAttention, AttentionLayer
 from models.embed import DataEmbedding
 
+from utils.RevIN import RevIN
+
 class Informer(nn.Module):
     def __init__(self, enc_in, dec_in, c_out, seq_len, label_len, out_len, 
                 factor=5, d_model=512, n_heads=8, e_layers=3, d_layers=2, d_ff=512, 
                 dropout=0.0, attn='prob', embed='fixed', freq='h', activation='gelu', 
                 output_attention = False, distil=True, mix=True,
-                device=torch.device('cuda:0')):
+                device=torch.device('cuda:0'), use_RevIN=True):
         super(Informer, self).__init__()
         self.pred_len = out_len
         self.attn = attn
@@ -63,9 +65,20 @@ class Informer(nn.Module):
         # self.end_conv1 = nn.Conv1d(in_channels=label_len+out_len, out_channels=out_len, kernel_size=1, bias=True)
         # self.end_conv2 = nn.Conv1d(in_channels=d_model, out_channels=c_out, kernel_size=1, bias=True)
         self.projection = nn.Linear(d_model, c_out, bias=True)
+
+       self.use_RevIN = use_RevIN
+        if use_RevIN:
+            self.revin = RevIN(enc_in)
+            print(f'Using Revin', flush=True)
+
+    
         
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, 
                 enc_self_mask=None, dec_self_mask=None, dec_enc_mask=None):
+        if self.use_RevIN:
+            x_enc = self.revin(x_enc, 'norm')
+            print(f'Encoding Using Revin', flush=True)
+
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=enc_self_mask)
 
@@ -75,6 +88,12 @@ class Informer(nn.Module):
         
         # dec_out = self.end_conv1(dec_out)
         # dec_out = self.end_conv2(dec_out.transpose(2,1)).transpose(1,2)
+        
+        if self.use_RevIN:
+            dec_out = self.revin(dec_out, 'denorm')
+            print(f'Decoding Using Revin', flush=True)
+
+                    
         if self.output_attention:
             return dec_out[:,-self.pred_len:,:], attns
         else:
