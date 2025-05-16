@@ -89,7 +89,7 @@ class Informer(nn.Module):
         # dec_out = self.end_conv2(dec_out.transpose(2,1)).transpose(1,2)
         
         if self.use_RevIN:
-            dec_out = self.revin(dec_out, 'denorm')
+            #dec_out = self.revin(dec_out, 'denorm')
             print(f'Decoding Using Revin', flush=True)
 
                     
