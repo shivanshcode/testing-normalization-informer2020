@@ -214,8 +214,6 @@ class Exp_Informer(Exp_Basic):
         trues = trues.reshape(-1, trues.shape[-2], trues.shape[-1])
         # New shape: (test_size, pred_length, columns)
         print('test shape:', preds.shape, trues.shape)
-        print('test shape with inverse transform:', test_data.scaler.inverse_transform(preds), test_data.scaler.inverse_transform(trues))
-
 
         # result save
         folder_path = './results/' + setting +'/'
@@ -226,8 +224,8 @@ class Exp_Informer(Exp_Basic):
         print('mse:{}, mae:{}'.format(mse, mae))
 
         np.save(folder_path+'metrics.npy', np.array([mae, mse, rmse, mape, mspe]))
-        np.save(folder_path+'pred.npy', preds)
-        np.save(folder_path+'true.npy', trues)
+        np.save(folder_path+'pred.npy', test_data.scaler.inverse_transform(preds))
+        np.save(folder_path+'true.npy', test_data.scaler.inverse_transform(trues))
 
         return
 
@@ -256,7 +254,7 @@ class Exp_Informer(Exp_Basic):
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
         
-        np.save(folder_path+'real_prediction.npy', preds)
+        np.save(folder_path+'real_prediction.npy', pred_data.scaler.inverse_transform(preds))
         
         return
 
