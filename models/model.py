@@ -76,8 +76,7 @@ class Informer(nn.Module):
                 enc_self_mask=None, dec_self_mask=None, dec_enc_mask=None):
         if self.use_RevIN:
             x_enc = self.revin(x_enc, 'norm')
-            print(f'Encoding Using Revin', flush=True)
-
+            
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=enc_self_mask)
 
@@ -89,9 +88,8 @@ class Informer(nn.Module):
         # dec_out = self.end_conv2(dec_out.transpose(2,1)).transpose(1,2)
         
         if self.use_RevIN:
-            #dec_out = self.revin(dec_out, 'denorm')
-            print(f'Decoding Using Revin', flush=True)
-
+            dec_out = self.revin(dec_out, 'denorm')
+            
                     
         if self.output_attention:
             return dec_out[:,-self.pred_len:,:], attns
