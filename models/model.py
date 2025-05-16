@@ -66,13 +66,12 @@ class Informer(nn.Module):
         # self.end_conv2 = nn.Conv1d(in_channels=d_model, out_channels=c_out, kernel_size=1, bias=True)
         self.projection = nn.Linear(d_model, c_out, bias=True)
 
-       self.use_RevIN = use_RevIN
+        self.use_RevIN = use_RevIN
         if use_RevIN:
             self.revin = RevIN(enc_in)
             print(f'Using Revin', flush=True)
 
     
-        
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, 
                 enc_self_mask=None, dec_self_mask=None, dec_enc_mask=None):
         if self.use_RevIN:
