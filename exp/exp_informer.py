@@ -212,7 +212,10 @@ class Exp_Informer(Exp_Basic):
         print('test shape:', preds.shape, trues.shape)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
         trues = trues.reshape(-1, trues.shape[-2], trues.shape[-1])
+        # New shape: (test_size, pred_length, columns)
         print('test shape:', preds.shape, trues.shape)
+        print('test shape with inverse transform:', test_data.scaler.inverse_transform(preds), test_data.scaler.inverse_transform(trues))
+
 
         # result save
         folder_path = './results/' + setting +'/'
